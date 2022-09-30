@@ -1,0 +1,27 @@
+{
+  "name": "@yetanothertool/onebtwoionec",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "author": "Studio Webux",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudformation": "^3.181.0",
+    "@aws-sdk/client-codepipeline": "^3.181.0",
+    "@aws-sdk/client-sts": "^3.181.0",
+    "@aws-sdk/credential-provider-ini": "^3.181.0",
+    "@aws-sdk/credential-providers": "^3.181.0",
+    "@tauri-apps/api": "^1.1.0",
+    "vue": "^3.2.37"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^3.0.1",
+    "vite": "^3.0.2",
+    "@tauri-apps/cli": "^1.1.0"
+  }
+}
