@@ -8,9 +8,13 @@
   },
   "package": {
     "productName": "onebtwoionec",
-    "version": "0.0.0"
+    "version": "1.0.0"
   },
   "tauri": {
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true
+    },
     "allowlist": {
       "fs": {
         "scope": ["$HOME/.aws/credentials", "$HOME/onebtwoionec.config.json"],
@@ -62,10 +66,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 360,
+        "height": 399,
         "resizable": false,
         "title": "onebtwoionec",
-        "width": 500
+        "width": 399
       }
     ]
   }

@@ -16,7 +16,10 @@ const selectedPipeline = ref("");
 const branchName = ref("");
 const credentials = ref("");
 const profiles = ref("");
+
 const message = ref("");
+const error = ref("");
+
 const isLoading = ref("");
 
 onMounted(async () => {
@@ -37,10 +40,18 @@ async function updatePipeline(pipeline, branchName) {
   });
   let _pipeline = { ...pipeline };
 
+  let altered = false;
   _pipeline.stages.map((stage) => {
-    if (stage.name === "Source")
+    if (stage.name.includes(selectedPipeline.value.codePipelineActionName)) {
       stage.actions[0].configuration.BranchName = branchName; // eurk..
+      altered = true;
+    }
   });
+
+  if (!altered)
+    throw new Error(
+      "Unable to update the pipeline; Action might not have been found, verify your configuration in ~/onebtwoionec.config.json"
+    );
 
   const command = new UpdatePipelineCommand({
     name: pipeline.name,
@@ -72,15 +83,18 @@ async function assumeRole() {
   let profile = profiles.value.find((pv) =>
     pv.profile.includes(selectedPipeline.value.profile)
   );
+
+  if (!profile) throw new Error("Profile not found");
+
   const client = new STSClient({
-    region: "us-east-1",
+    region: "us-east-1", // this is ok that it is hardcoded
     credentials:
       profile.credentials?.AccessKeyId && profile.credentials?.secretAccessKey
         ? profile.credentials
         : profile.sourceProfile?.credentials,
   });
   const command = new AssumeRoleCommand({
-    RoleSessionName: "onebtwoionec",
+    RoleSessionName: "onebtwoionec", // this is ok that it is hardcoded
     RoleArn: profile.roleArn,
   });
 
@@ -114,7 +128,7 @@ async function loadConfig() {
     );
     message.value = "Ready";
   } catch (e) {
-    message.value =
+    error.value =
       e.message ||
       "Failed to load the configuration in " +
         (await homeDir()) +
@@ -131,91 +145,124 @@ async function loadCredentials() {
       rawCredentials: credentials.value,
     });
   } catch (e) {
-    message.value = e.message;
+    error.value = e.message;
   }
 }
 
-async function start() {
-  isLoading.value = true;
-  console.log("Start");
-  await update();
-  message.value = "Pipeline branch name is up-to-date";
-  const msg = await startPipeline();
-  message.value = `Pipeline started : ${msg.pipelineExecutionId}`;
-  selectedPipeline.value = null;
-  branchName.value = "";
+function resetMessage() {
+  message.value = null;
+  error.value = null;
+}
 
-  isLoading.value = false;
+async function start() {
+  try {
+    resetMessage();
+    isLoading.value = true;
+    console.log("Start");
+    if (branchName.value !== "") {
+      await update();
+      message.value = "Pipeline branch name is up-to-date";
+    }
+    const msg = await startPipeline();
+    message.value = `Pipeline started : ${msg.pipelineExecutionId}`;
+    selectedPipeline.value = null;
+    branchName.value = "";
+  } catch (e) {
+    error.value = e.message;
+    throw e;
+  } finally {
+    isLoading.value = false;
+  }
 }
 
 async function update() {
-  isLoading.value = true;
-  console.log("Update");
-  const pipelineInfo = await getPipeline();
-  await updatePipeline(pipelineInfo.pipeline, branchName.value);
-  message.value = "Branch name updated";
-  isLoading.value = false;
+  try {
+    resetMessage();
+    isLoading.value = true;
+    console.log("Update");
+    const pipelineInfo = await getPipeline();
+    await updatePipeline(pipelineInfo.pipeline, branchName.value);
+    message.value = "Branch name updated";
+  } catch (e) {
+    error.value = e.message;
+    throw e;
+  } finally {
+    isLoading.value = false;
+  }
 }
 </script>
 
 <template>
   <div class="card">
-    <form>
-      <div>
-        <label for="pipeline">Select a pipeline</label>
-        <select name="pipeline" id="pipeline" v-model="selectedPipeline">
-          <option selected>-- Select a Pipeline --</option>
-          <option
-            :value="config"
-            v-for="config in configurations"
-            :key="config.pipeline"
+    <div class="card-body">
+      <form>
+        <div>
+          <label for="pipeline"
+            >Select a pipeline (<span class="fw-bold"
+              >&nbsp;{{ configurations.length }}&nbsp;</span
+            >)</label
           >
-            {{ config.friendlyName }}
-          </option>
-        </select>
+          <select
+            class="form-select"
+            name="pipeline"
+            id="pipeline"
+            v-model="selectedPipeline"
+          >
+            <option
+              :value="config"
+              v-for="config in configurations"
+              :key="config.pipeline"
+            >
+              {{ config.friendlyName }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label for="branch">What branch to deploy</label>
+          <input
+            class="form-control"
+            type="text"
+            name="branch"
+            placeholder="branch name"
+            v-model="branchName"
+          />
+        </div>
+      </form>
+
+      <div class="d-grid gap-2 mt-2 p-2">
+        <button
+          class="btn btn-outline-primary"
+          type="button"
+          @click="start()"
+          :disabled="!selectedPipeline || isLoading === true"
+        >
+          Start
+        </button>
       </div>
 
-      <div>
-        <label for="branch">What branch to deploy</label>
-        <input
-          type="text"
-          name="branch"
-          placeholder="branch name"
-          v-model="branchName"
-        />
-      </div>
-    </form>
+      <!-- <div>
+        <button
+          class="btn btn-outline-primary"
+          type="button"
+          @click="update()"
+          :disabled="
+            branchName === '' || !selectedPipeline || isLoading === true
+          "
+        >
+          Update Branch Name (only)
+        </button>
+      </div> -->
 
-    <button
-      class="btn btn-outline-primary"
-      type="button"
-      @click="start()"
-      :disabled="!selectedPipeline || isLoading === true"
-    >
-      Start
-    </button>
+      <hr />
 
-    <div>
-      <button
-        class="btn btn-outline-primary"
-        type="button"
-        @click="update()"
-        :disabled="branchName === '' || !selectedPipeline || isLoading === true"
-      >
-        Update Branch Name (only)
-      </button>
+      <p class="border rounded p-2 shadow text-center">
+        <span v-if="isLoading">Wait for it..</span>
+        <span class="text-success text-xs" v-if="!isLoading && message">{{
+          message
+        }}</span>
+        <span class="text-danger text-xs" v-else>{{ error }}</span>
+      </p>
     </div>
-
-    <p v-if="isLoading">Wait for it..</p>
-
-    <hr />
-
-    <p class="success green">{{ message }}</p>
   </div>
 </template>
-
-<style scoped>
-.green {
-  color: #00a300;
-}
-</style>
