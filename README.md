@@ -74,6 +74,9 @@ npm run tauri dev
 
 ```bash
 npm run tauri build
+# OR to build MacOS universal
+rustup target add x86_64-apple-darwin
+npx tauri build --target universal-apple-darwin
 ```
 
 Enjoy !
