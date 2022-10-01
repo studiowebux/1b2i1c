@@ -1,0 +1,11 @@
+name: backend
+on: 
+    workflow_dispatch:
+    # push: This is used to simulate other pipeline as well
+jobs:
+  start-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test
+        run: echo "I have started successfully - Backend"
+        shell: bash

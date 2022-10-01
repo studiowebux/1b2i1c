@@ -25,6 +25,7 @@
     <li>
       <a href="#usage">Usage</a>
     </li>
+    <li><a href="#changelog">Changelog</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -92,24 +93,61 @@ nano ~/onebtwoionec.config.json
 ```
 
 ```json
-[
-  {
-    "friendlyName": "@yet-another-tool/demo-repo-public", // --> the name that will appear in the UI
-    "pipeline": "test", // --> The codepipeline name to start/update
-    "profile": "my-account-deployment", // --> Your AWS profile to use
-    "region": "us-east-1", // --> The AWS Region to target
-    "codePipelineActionName": "Source" // --> The CodePipeline Action Name for the Source step
-  }
-]
+{
+  "authentication": {
+    "github": {
+      "api_key": "YOUR_PERSONAL_GITHUB_API_KEY"
+    }
+  },
+  "pipelines": [
+    {
+      "friendlyName": "AWS ra-demo-repo-private",
+      "pipeline": "test",
+      "profile": "deployment",
+      "region": "ca-central-1",
+      "codePipelineActionName": "Source",
+      "type": "codepipeline"
+    },
+    {
+      "friendlyName": "GH ra-demo-repo-private",
+      "workflow_id": "backend.yml",
+      "repository": "ra-demo-repo-private",
+      "owner": "yet-another-tool",
+      "inputs": {},
+      "type": "github"
+    }
+  ]
+}
 ```
 
-2. Then setup your AWS credentials as usual (I only tested the assume role using IAM user and role).
+2. Then setup your **AWS credentials** as usual (I only tested the assume role using IAM user and role).
 
-3. Finally open the application.
+   > Required only if you are using AWS CodePipeline
+
+3. When using **Github Actions**, you MUST provide the **branch name** manually (_aka `ref`_)
+
+4. Finally open the application.
 
 ![Application](./docs/application_v1.0.0.png)
 
+**Github Action Example** with the `workflow_dispatch` approach: [backend.yml](./docs/backend.yml)
+
 ---
+
+## Changelog
+
+### V1.1.0 - Added Github Actions - 2022-10-01
+
+- Start Github Actions using the workflow_dispatch
+- Added Github Personal Access Token
+- Reworked the configuration file to implement multi providers
+- Revamp the code structure
+- Added Github Actions example
+
+### V1.0.0 - CodePipeline - 2022-09-30
+
+- Start CodePipeline 
+- Update CodePipeline Source Branch Name
 
 ## Contributing
 

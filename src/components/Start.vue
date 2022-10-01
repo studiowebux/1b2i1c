@@ -3,13 +3,9 @@ import { ref, onMounted } from "vue";
 import { extractProfiles, readCredentials } from "../utils/aws";
 import { readTextFile, BaseDirectory } from "@tauri-apps/api/fs";
 import { homeDir } from "@tauri-apps/api/path";
-import {
-  CodePipelineClient,
-  StartPipelineExecutionCommand,
-  GetPipelineCommand,
-  UpdatePipelineCommand,
-} from "@aws-sdk/client-codepipeline";
-import { STSClient, AssumeRoleCommand } from "@aws-sdk/client-sts";
+
+import { StartCodePipeline, UpdateCodePipeline } from "../utils/codepipeline";
+import { useGithubAction } from "../utils/github";
 
 const configurations = ref("");
 const selectedPipeline = ref("");
@@ -27,96 +23,32 @@ onMounted(async () => {
   await loadConfig();
 });
 
-async function updatePipeline(pipeline, branchName) {
-  let assumedRole = await assumeRole();
-
-  const client = new CodePipelineClient({
-    region: selectedPipeline.value.region,
-    credentials: {
-      accessKeyId: assumedRole.Credentials.AccessKeyId,
-      secretAccessKey: assumedRole.Credentials.SecretAccessKey,
-      sessionToken: assumedRole.Credentials.SessionToken,
-    },
-  });
-  let _pipeline = { ...pipeline };
-
-  let altered = false;
-  _pipeline.stages.map((stage) => {
-    if (stage.name.includes(selectedPipeline.value.codePipelineActionName)) {
-      stage.actions[0].configuration.BranchName = branchName; // eurk..
-      altered = true;
-    }
-  });
-
-  if (!altered)
-    throw new Error(
-      "Unable to update the pipeline; Action might not have been found, verify your configuration in ~/onebtwoionec.config.json"
-    );
-
-  const command = new UpdatePipelineCommand({
-    name: pipeline.name,
-    pipeline: _pipeline,
-  });
-
-  return client.send(command);
-}
-
-async function getPipeline() {
-  let assumedRole = await assumeRole();
-
-  const client = new CodePipelineClient({
-    region: selectedPipeline.value.region,
-    credentials: {
-      accessKeyId: assumedRole.Credentials.AccessKeyId,
-      secretAccessKey: assumedRole.Credentials.SecretAccessKey,
-      sessionToken: assumedRole.Credentials.SessionToken,
-    },
-  });
-  const command = new GetPipelineCommand({
-    name: selectedPipeline.value.pipeline,
-  });
-
-  return client.send(command);
-}
-
-async function assumeRole() {
-  let profile = profiles.value.find((pv) =>
-    pv.profile.includes(selectedPipeline.value.profile)
-  );
-
-  if (!profile) throw new Error("Profile not found");
-
-  const client = new STSClient({
-    region: "us-east-1", // this is ok that it is hardcoded
-    credentials:
-      profile.credentials?.AccessKeyId && profile.credentials?.secretAccessKey
-        ? profile.credentials
-        : profile.sourceProfile?.credentials,
-  });
-  const command = new AssumeRoleCommand({
-    RoleSessionName: "onebtwoionec", // this is ok that it is hardcoded
-    RoleArn: profile.roleArn,
-  });
-
-  return await client.send(command);
-}
-
 async function startPipeline() {
-  let assumedRole = await assumeRole();
-
-  const client = new CodePipelineClient({
-    region: selectedPipeline.value.region,
-    credentials: {
-      accessKeyId: assumedRole.Credentials.AccessKeyId,
-      secretAccessKey: assumedRole.Credentials.SecretAccessKey,
-      sessionToken: assumedRole.Credentials.SessionToken,
-    },
-  });
-  const command = new StartPipelineExecutionCommand({
-    name: selectedPipeline.value.pipeline,
-  });
-
-  return client.send(command);
+  switch (selectedPipeline.value.type) {
+    case "codepipeline":
+      if (branchName.value !== "")
+        await UpdateCodePipeline({
+          profiles: profiles.value,
+          selectedPipeline: selectedPipeline.value,
+          branchName: branchName.value,
+        });
+      return StartCodePipeline({
+        profiles: profiles.value,
+        selectedPipeline: selectedPipeline.value,
+      });
+    case "github":
+      if (branchName.value === "") throw new Error("Missing branch name");
+      return useGithubAction({
+        auth: configurations.value.authentication.github.api_key,
+        workflow_id: selectedPipeline.value.workflow_id,
+        ref: branchName.value,
+        repo: selectedPipeline.value.repository,
+        owner: selectedPipeline.value.owner,
+        inputs: selectedPipeline.value.inputs,
+      });
+    default:
+      throw new Error("Incorrect pipeline type");
+  }
 }
 
 async function loadConfig() {
@@ -139,7 +71,7 @@ async function loadConfig() {
 async function loadCredentials() {
   try {
     // console.debug("Read Credentials");
-    credentials.value = await readCredentials({});
+    credentials.value = await readCredentials();
     // console.debug("Extract Profiles");
     profiles.value = await extractProfiles({
       rawCredentials: credentials.value,
@@ -159,30 +91,12 @@ async function start() {
     resetMessage();
     isLoading.value = true;
     console.log("Start");
-    if (branchName.value !== "") {
-      await update();
-      message.value = "Pipeline branch name is up-to-date";
-    }
+
     const msg = await startPipeline();
-    message.value = `Pipeline started : ${msg.pipelineExecutionId}`;
+    message.value = `Pipeline started : ${msg.pipelineExecutionId || "Ok !"}`;
+
     selectedPipeline.value = null;
     branchName.value = "";
-  } catch (e) {
-    error.value = e.message;
-    throw e;
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-async function update() {
-  try {
-    resetMessage();
-    isLoading.value = true;
-    console.log("Update");
-    const pipelineInfo = await getPipeline();
-    await updatePipeline(pipelineInfo.pipeline, branchName.value);
-    message.value = "Branch name updated";
   } catch (e) {
     error.value = e.message;
     throw e;
@@ -194,12 +108,12 @@ async function update() {
 
 <template>
   <div class="card">
-    <div class="card-body">
+    <div class="card-body" v-if="configurations">
       <form>
         <div>
           <label for="pipeline"
             >Select a pipeline (<span class="fw-bold"
-              >&nbsp;{{ configurations.length }}&nbsp;</span
+              >&nbsp;{{ configurations.pipelines.length }}&nbsp;</span
             >)</label
           >
           <select
@@ -210,7 +124,7 @@ async function update() {
           >
             <option
               :value="config"
-              v-for="config in configurations"
+              v-for="config in configurations.pipelines"
               :key="config.pipeline"
             >
               {{ config.friendlyName }}
@@ -235,7 +149,11 @@ async function update() {
           class="btn btn-outline-primary"
           type="button"
           @click="start()"
-          :disabled="!selectedPipeline || isLoading === true"
+          :disabled="
+            !selectedPipeline ||
+            isLoading === true ||
+            (selectedPipeline.type === 'github' && branchName === '')
+          "
         >
           Start
         </button>
@@ -264,5 +182,7 @@ async function update() {
         <span class="text-danger text-xs" v-else>{{ error }}</span>
       </p>
     </div>
+
+    <div class="card-body" v-else>Loading...</div>
   </div>
 </template>

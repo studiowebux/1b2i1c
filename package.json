@@ -1,7 +1,7 @@
 {
   "name": "@yetanothertool/onebtwoionec",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "author": "Studio Webux",
   "scripts": {
@@ -16,6 +16,7 @@
     "@aws-sdk/client-sts": "^3.181.0",
     "@aws-sdk/credential-provider-ini": "^3.181.0",
     "@aws-sdk/credential-providers": "^3.181.0",
+    "@octokit/rest": "^19.0.4",
     "@popperjs/core": "^2.11.6",
     "@tauri-apps/api": "^1.1.0",
     "bootstrap": "^5.2.1",
