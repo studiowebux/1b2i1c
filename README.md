@@ -104,7 +104,7 @@ nano ~/onebtwoionec.config.json
 
 3. Finally open the application.
 
-![Application](./docs/application.png)
+![Application](./docs/application_v1.0.0.png)
 
 ---
 
