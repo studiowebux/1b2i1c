@@ -1,16 +1,8 @@
+// Studio Webux @ 2022
 import { readTextFile, BaseDirectory } from "@tauri-apps/api/fs";
+import { STSClient, AssumeRoleCommand } from "@aws-sdk/client-sts";
 
-const checkHomePath = ({ customPath }) => {
-  if (!customPath) {
-    return customPath;
-  }
-  if (customPath.includes("~")) {
-    return customPath.replace("~", BaseDirectory.Home);
-  }
-  return customPath;
-};
-
-const readCredentials = async ({ customPath }) =>
+const readCredentials = async () =>
   readTextFile(".aws/credentials", { dir: BaseDirectory.Home });
 
 const convertToArray = ({ rawCredentials }) => {
@@ -138,10 +130,32 @@ const extractProfiles = async ({ rawCredentials }) => {
   );
 };
 
+async function assumeRole({ profiles, profile }) {
+  console.debug(profiles);
+  let _profile = profiles.find((pv) => pv.profile.includes(profile));
+
+  if (!_profile) throw new Error("Profile not found");
+
+  const client = new STSClient({
+    region: "us-east-1", // this is ok that it is hardcoded
+    credentials:
+      _profile.credentials?.AccessKeyId && _profile.credentials?.secretAccessKey
+        ? _profile.credentials
+        : _profile.sourceProfile?.credentials,
+  });
+  const command = new AssumeRoleCommand({
+    RoleSessionName: "onebtwoionec", // this is ok that it is hardcoded
+    RoleArn: _profile.roleArn,
+  });
+
+  return await client.send(command);
+}
+
 export {
   readCredentials,
   convertToArray,
   determineSection,
   extractProfiles,
   extractOneProfile,
+  assumeRole,
 };
