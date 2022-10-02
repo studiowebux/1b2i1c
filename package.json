@@ -4,6 +4,7 @@
   "version": "1.1.1",
   "type": "module",
   "author": "Studio Webux",
+  "description": "A simple and configurable UI to Start and Update CodePipeline and/or Github Actions",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
