@@ -4,6 +4,9 @@ on:
   - workflow_dispatch
   - pull_request
 
+permissions:
+  contents: write
+
 jobs:
   create-release:
     runs-on: ubuntu-20.04
