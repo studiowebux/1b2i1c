@@ -70,7 +70,7 @@ jobs:
       - name: install app dependencies and build it
         if: matrix.platform == 'ubuntu-20.04' || matrix.platform == 'windows-latest'
         run: yarn && yarn build
-      - uses: tauri-apps/tauri-action@v0
+      - uses: yet-another-tool/tauri-action@v1.0.0
         if: matrix.platform == 'macos-latest'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
