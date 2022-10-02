@@ -17,10 +17,13 @@ const message = ref("");
 const error = ref("");
 
 const isLoading = ref("");
+const isInitializing = ref("");
 
 onMounted(async () => {
+  isInitializing.value = true;
   await loadCredentials();
   await loadConfig();
+  isInitializing.value = false;
 });
 
 async function startPipeline() {
@@ -60,6 +63,7 @@ async function loadConfig() {
     );
     message.value = "Ready";
   } catch (e) {
+    configurations.value = [];
     error.value =
       e.message ||
       "Failed to load the configuration in " +
@@ -77,6 +81,8 @@ async function loadCredentials() {
       rawCredentials: credentials.value,
     });
   } catch (e) {
+    credentials.value = "";
+    profiles.value = [];
     error.value = e.message;
   }
 }
@@ -108,8 +114,12 @@ async function start() {
 
 <template>
   <div class="card">
-    <div class="card-body" v-if="configurations">
-      <form>
+    <div
+      id="pipeline"
+      class="card-body"
+      v-if="configurations && configurations.pipelines"
+    >
+      <form id="inputs">
         <div>
           <label for="pipeline"
             >Select a pipeline (<span class="fw-bold"
@@ -144,7 +154,7 @@ async function start() {
         </div>
       </form>
 
-      <div class="d-grid gap-2 mt-2 p-2">
+      <div id="buttons" class="d-grid gap-2 mt-2 p-2">
         <button
           class="btn btn-outline-primary"
           type="button"
@@ -159,21 +169,10 @@ async function start() {
         </button>
       </div>
 
-      <!-- <div>
-        <button
-          class="btn btn-outline-primary"
-          type="button"
-          @click="update()"
-          :disabled="
-            branchName === '' || !selectedPipeline || isLoading === true
-          "
-        >
-          Update Branch Name (only)
-        </button>
-      </div> -->
-
       <hr />
+    </div>
 
+    <div id="messages" class="card-body">
       <p class="border rounded p-2 shadow text-center">
         <span v-if="isLoading">Wait for it..</span>
         <span class="text-success text-xs" v-if="!isLoading && message">{{
@@ -183,6 +182,6 @@ async function start() {
       </p>
     </div>
 
-    <div class="card-body" v-else>Loading...</div>
+    <div id="loading" class="card-body" v-if="isInitializing">Loading...</div>
   </div>
 </template>
