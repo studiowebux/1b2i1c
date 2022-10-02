@@ -71,6 +71,7 @@ jobs:
         if: matrix.platform == 'ubuntu-20.04' || matrix.platform == 'windows-latest'
         run: yarn && yarn build
       - uses: tauri-apps/tauri-action@v0
+        if: matrix.platform != 'macos-latest'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
