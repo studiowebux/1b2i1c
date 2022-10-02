@@ -4,7 +4,7 @@
 
 <h2>1 Button 2 Inputs 1 Configuration</h2>
 
-<p>A simple and configurable UI to Start and Update CodePipeline.</p>
+<p>A simple and configurable UI to Start and Update CodePipeline and/or Github Actions.</p>
 
 <p align="center">
   <a href="https://github.com/yet-another-tool/1b2i1c/issues">Report Bug</a>
@@ -79,6 +79,8 @@ npm run tauri build
 rustup target add x86_64-apple-darwin
 npx tauri build --target universal-apple-darwin
 ```
+
+You can also get the latest build in the **releases** section.
 
 Enjoy !
 
