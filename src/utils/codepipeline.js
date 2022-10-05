@@ -4,6 +4,7 @@ import {
   StartPipelineExecutionCommand,
   GetPipelineCommand,
   UpdatePipelineCommand,
+  GetPipelineStateCommand,
 } from "@aws-sdk/client-codepipeline";
 import { assumeRole } from "./aws";
 
@@ -89,4 +90,26 @@ async function getPipeline({ profiles, selectedPipeline }) {
   return client.send(command);
 }
 
-export { StartCodePipeline, UpdateCodePipeline };
+async function getPipelineState({ profiles, selectedPipeline }) {
+  let assumedRole = await assumeRole({
+    profiles,
+    profile: selectedPipeline.profile,
+  });
+
+  const client = new CodePipelineClient({
+    region: selectedPipeline.region,
+    credentials: {
+      accessKeyId: assumedRole.Credentials.AccessKeyId,
+      secretAccessKey: assumedRole.Credentials.SecretAccessKey,
+      sessionToken: assumedRole.Credentials.SessionToken,
+    },
+  });
+
+  return client.send(
+    new GetPipelineStateCommand({
+      name: selectedPipeline.pipeline,
+    })
+  );
+}
+
+export { StartCodePipeline, UpdateCodePipeline, getPipelineState };

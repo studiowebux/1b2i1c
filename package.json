@@ -22,7 +22,8 @@
     "@tauri-apps/api": "^1.1.0",
     "bootstrap": "^5.2.1",
     "bootstrap-icons": "^1.9.1",
-    "vue": "^3.2.37"
+    "vue": "^3.2.37",
+    "vue-timeago3": "^2.3.0"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.1.1",
