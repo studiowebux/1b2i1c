@@ -62,13 +62,12 @@ async function start() {
     emit(
       "updateMessage",
       `Pipeline started : ${msg.pipelineExecutionId || "Ok !"}`,
-      null
+      ""
     );
 
-    emit("selectPipeline", null);
     branchName.value = "";
   } catch (e) {
-    emit("updateMessage", null, e.message);
+    emit("updateMessage", "", e.message);
     throw e;
   } finally {
     isLoading.value = false;

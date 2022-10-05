@@ -58,8 +58,8 @@ async function loadCredentials() {
 }
 
 function resetMessage() {
-  message.value = null;
-  error.value = null;
+  message.value = "";
+  error.value = "";
 }
 
 function updateMessage(_success, _error) {
@@ -80,7 +80,7 @@ function selectPipeline(pipeline) {
 
 <template>
   <div class="container p-3">
-    <div id="messages" class="card-body mb-1">
+    <div id="messages" class="card-body mb-1" v-if="message || error">
       <p class="border rounded p-2 shadow text-center">
         <span v-if="isLoading">Wait for it..</span>
         <span class="text-success text-xs" v-if="!isLoading && message">{{
@@ -110,6 +110,7 @@ function selectPipeline(pipeline) {
       :selectedPipeline="selectedPipeline"
       :configurations="configurations"
       @updateMessage="updateMessage"
+      @toggleLoading="toggleLoading"
     />
   </div>
 </template>
