@@ -1,6 +1,6 @@
 <div align="center">
 
-![Project Logo](https://webuxlab-static.s3.ca-central-1.amazonaws.com/logoAmpoule.svg)
+<img src="./docs/logo.png" alt="Project Logo" width="256">
 
 <h2>1 Button 2 Inputs 1 Configuration</h2>
 
@@ -130,13 +130,23 @@ nano ~/onebtwoionec.config.json
 
 4. Finally open the application.
 
-![Application](./docs/application_v1.0.0.png)
+<div align="center">
+<img src="./docs/v1.2.0.png" alt="Application V1.2.0" width="333">
+</div>
 
 **Github Action Example** with the `workflow_dispatch` approach: [backend.yml](./docs/backend.yml)
 
 ---
 
 ## Changelog
+
+### V1.2.0 - Added Github Actions - 2022-10-05
+
+- Tested the whole Github Action Flow
+- Tested on different systems (MacOS X64, M1 and Windows thanks @maxeber)
+- Reviewed and improved UI
+- Fixed bugs when CodePipeline response is not defined
+- Fixed time ago integration
 
 ### V1.1.0 - Added Github Actions - 2022-10-01
 
@@ -148,7 +158,7 @@ nano ~/onebtwoionec.config.json
 
 ### V1.0.0 - CodePipeline - 2022-09-30
 
-- Start CodePipeline 
+- Start CodePipeline
 - Update CodePipeline Source Branch Name
 
 ## Contributing
