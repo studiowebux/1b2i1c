@@ -140,6 +140,14 @@ nano ~/onebtwoionec.config.json
 
 ## Changelog
 
+### V1.2.0 - Added Github Actions - 2022-10-05
+
+- Tested the whole Github Action Flow
+- Tested on different systems (MacOS X64, M1 and Windows thanks @maxeber)
+- Reviewed and improved UI
+- Fixed bugs when CodePipeline response is not defined
+- Fixed time ago integration
+
 ### V1.1.0 - Added Github Actions - 2022-10-01
 
 - Start Github Actions using the workflow_dispatch
