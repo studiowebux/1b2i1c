@@ -140,6 +140,14 @@ nano ~/onebtwoionec.config.json
 
 ## Changelog
 
+### V1.3.0 - Improved Error/Success for the CodePipeline Source Action - 2023-01-04
+
+- This way it can guide you and avoid using the AWS UI and see quickly what is wrong with the source.
+<div align="center">
+<img src="./docs/errorHandling.png" alt="CodePipeline Source Error Handling" width="333">
+<img src="./docs/success.png" alt="CodePipeline Source Success" width="333">
+</div>
+
 ### V1.2.0 - Added Github Actions - 2022-10-05
 
 - Tested the whole Github Action Flow
