@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { getPipelineState } from "../utils/codepipeline";
+import { open } from "@tauri-apps/api/shell";
 
 const props = defineProps({
   configurations: Object,
@@ -33,6 +34,32 @@ async function refresh() {
     selectedPipeline: props.selectedPipeline,
   });
   emit("toggleLoading", false);
+}
+
+function getSummary(pipeline) {
+  try {
+    return JSON.parse(pipeline?.actionStates[0]?.latestExecution?.summary);
+  } catch (e) {
+    return {};
+  }
+}
+
+function getErrorMessage(pipeline) {
+  return (
+    pipeline?.actionStates[0]?.latestExecution?.errorDetails?.message || null
+  );
+}
+
+function getCommitId(pipeline) {
+  return (
+    pipeline?.actionStates[0]?.latestExecution?.externalExecutionId || null
+  );
+}
+
+function goToCodebuildLogs(pipeline) {
+  return (
+    pipeline?.actionStates[0]?.latestExecution?.externalExecutionUrl || null
+  );
 }
 </script>
 
@@ -92,6 +119,58 @@ async function refresh() {
               >{{ pipeline.latestExecution?.status }}</span
             >
           </div>
+
+          <div class="col-12">
+            <div v-if="getErrorMessage(pipeline)" class="p-2 border">
+              <p
+                class="text-center fw-light fst-italic text-xs text-break text-danger"
+              >
+                <span>
+                  {{ getErrorMessage(pipeline) }}
+                </span>
+                <span v-if="goToCodebuildLogs(pipeline)">
+                  <br />
+                  <a
+                    class="text-center fw-light text-sm"
+                    href="#"
+                    @click.prevent="open(goToCodebuildLogs(pipeline))"
+                    >Go To CodeBuild Project</a
+                  >
+                </span>
+              </p>
+            </div>
+
+            <div
+              class="text-center p-2 border text-primary"
+              v-else-if="Object.keys(getSummary(pipeline)).length > 0"
+            >
+              <ul class="list-group list-group-flush">
+                <li
+                  class="list-group-item"
+                  v-for="key in Object.keys(getSummary(pipeline))"
+                  :key="key"
+                >
+                  <div class="d-flex justify-content-between">
+                    <span class="fw-bolder text-start text-sm">{{
+                      key.split(/(?=[A-Z])/g).join(" ")
+                    }}</span>
+                    <span class="text-break text-end text-sm">{{
+                      getSummary(pipeline)[key]
+                    }}</span>
+                  </div>
+                </li>
+                <li class="list-group-item" v-if="getCommitId(pipeline)">
+                  <div class="d-flex justify-content-between">
+                    <span class="fw-bolder text-start text-sm">Commit Id</span>
+                    <span class="text-break text-end text-sm">{{
+                      getCommitId(pipeline).substring(0, 8)
+                    }}</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
           <div class="col-12">
             <hr class="w-75 mx-auto" />
           </div>
