@@ -29,7 +29,12 @@ async function StartCodePipeline({ profiles, selectedPipeline }) {
   return client.send(command);
 }
 
-async function UpdateCodePipeline({ profiles, selectedPipeline, branchName }) {
+async function UpdateCodePipeline({
+  profiles,
+  selectedPipeline,
+  branchName,
+  detectChanges,
+}) {
   let assumedRole = await assumeRole({
     profiles,
     profile: selectedPipeline.profile,
@@ -51,7 +56,12 @@ async function UpdateCodePipeline({ profiles, selectedPipeline, branchName }) {
   let altered = false;
   _pipeline.stages.map((stage) => {
     if (stage.name.includes(selectedPipeline.codePipelineActionName)) {
-      stage.actions[0].configuration.BranchName = branchName; // eurk..
+      stage.actions[0].configuration.BranchName =
+        branchName || stage.actions[0].configuration.BranchName; // eurk..
+      stage.actions[0].configuration.DetectChanges =
+        detectChanges !== null
+          ? detectChanges.toString()
+          : stage.actions[0].configuration.DetectChanges;
       altered = true;
     }
   });
@@ -112,4 +122,4 @@ async function getPipelineState({ profiles, selectedPipeline }) {
   );
 }
 
-export { StartCodePipeline, UpdateCodePipeline, getPipelineState };
+export { StartCodePipeline, UpdateCodePipeline, getPipelineState, getPipeline };
