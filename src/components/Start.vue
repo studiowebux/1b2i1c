@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps } from "vue";
+import { ref } from "vue";
 
 import { StartCodePipeline, UpdateCodePipeline } from "../utils/codepipeline";
 import { useGithubAction } from "../utils/github";
