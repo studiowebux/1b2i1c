@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref } from "vue";
-import { getPipelineState } from "../utils/codepipeline";
+import { getPipeline, getPipelineState } from "../utils/codepipeline";
 import { open } from "@tauri-apps/api/shell";
 
 const props = defineProps({
@@ -11,6 +11,7 @@ const props = defineProps({
 });
 
 const pipelineState = ref({});
+const pipelineData = ref({});
 
 function isValidDate(date) {
   return date instanceof Date && !isNaN(date);
@@ -19,21 +20,34 @@ function isValidDate(date) {
 const emit = defineEmits(["updateMessage", "toggleLoading"]);
 
 onMounted(async () => {
-  pipelineState.value = await getPipelineState({
-    profiles: props.profiles,
-    selectedPipeline: props.selectedPipeline,
-  });
+  await loadPipelineState();
+  await loadPipeline();
 });
 
 async function refresh() {
   emit("updateMessage", "Refreshing Status...");
   emit("toggleLoading", true);
   pipelineState.value = {};
+  pipelineData.value = {};
+
+  await loadPipelineState();
+  await loadPipeline();
+
+  emit("toggleLoading", false);
+}
+
+async function loadPipeline() {
+  pipelineData.value = await getPipeline({
+    profiles: props.profiles,
+    selectedPipeline: props.selectedPipeline,
+  });
+}
+
+async function loadPipelineState() {
   pipelineState.value = await getPipelineState({
     profiles: props.profiles,
     selectedPipeline: props.selectedPipeline,
   });
-  emit("toggleLoading", false);
 }
 
 function getSummary(pipeline) {
@@ -56,9 +70,21 @@ function getCommitId(pipeline) {
   );
 }
 
+function getGitUrl(pipeline) {
+  return pipeline?.actionStates[0]?.entityUrl || null;
+}
+
 function goToCodebuildLogs(pipeline) {
   return (
     pipeline?.actionStates[0]?.latestExecution?.externalExecutionUrl || null
+  );
+}
+
+function getFullRepositoryId() {
+  console.log(pipelineData.value.pipeline?.stages[0].actions[0]);
+  return (
+    pipelineData.value.pipeline?.stages[0]?.actions[0]?.configuration
+      ?.FullRepositoryId || null
   );
 }
 </script>
@@ -66,24 +92,188 @@ function goToCodebuildLogs(pipeline) {
 <template>
   <div class="card">
     <div class="card-body">
-      <h6>AWS CodePipeline Status</h6>
+      <div class="d-flex justify-content-between align-items-baseline">
+        <div>
+          <h4>AWS CodePipeline Status</h4>
+        </div>
+        <div class="">
+          <a
+            data-bs-toggle="collapse"
+            href="#moreInfoCollapse"
+            role="button"
+            aria-expanded="false"
+            aria-controls="moreInfoCollapse"
+          >
+            <i class="bi bi-info-circle text-xl text-info fw-bolder"></i>
+          </a>
+        </div>
+      </div>
+
+      <div id="moreInfoCollapse" class="collapse">
+        <div class="card mb-3">
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                <div class="d-flex flex-column justify-content-between">
+                  <span
+                    class="fw-bolder text-start text-sm text-decoration-underline"
+                    >Artifact Store</span
+                  >
+                  <span class="text-break text-start text-sm"
+                    >[
+                    <span class="fw-bold">{{
+                      pipelineData?.pipeline?.artifactStore?.type
+                    }}</span>
+                    ]&nbsp;{{ pipelineData?.pipeline?.artifactStore?.location }}
+                  </span>
+                </div>
+              </li>
+
+              <li class="list-group-item">
+                <div class="d-flex flex-column justify-content-between">
+                  <span
+                    class="fw-bolder text-start text-sm text-decoration-underline"
+                    >Role Arn</span
+                  >
+                  <span class="text-break text-start text-xs"
+                    >{{ pipelineData?.pipeline?.roleArn }}
+                  </span>
+                </div>
+              </li>
+
+              <li
+                class="list-group-item"
+                v-if="pipelineData?.metadata?.updated"
+              >
+                <div class="d-flex flex-column justify-content-between">
+                  <span
+                    class="fw-bolder text-start text-sm text-decoration-underline"
+                  >
+                    Last Pipeline Update:
+                  </span>
+                  <span class="text-break text-start text-sm">
+                    <timeago
+                      v-if="
+                        isValidDate(new Date(pipelineData?.metadata?.updated))
+                      "
+                      :datetime="pipelineData?.metadata?.updated"
+                  /></span>
+                </div>
+              </li>
+
+              <li class="list-group-item mt-2">
+                <div>
+                  <span
+                    class="fw-bolder text-start text-sm text-decoration-underline"
+                    >Action{{
+                      pipelineData?.pipeline?.stages?.length > 0 ? "s" : ""
+                    }}
+                    ({{ pipelineData?.pipeline?.stages?.length }})</span
+                  >
+                </div>
+
+                <div
+                  class="d-flex flex-column justify-content-between p-3 border rounded"
+                >
+                  <div
+                    v-for="stage in pipelineData?.pipeline?.stages"
+                    :key="stage.name"
+                  >
+                    <span class="fw-bold">
+                      {{ stage.name }}
+                    </span>
+                    <div
+                      class="mb-2 text-sm text-break"
+                      v-for="action in stage.actions"
+                      :key="action.name"
+                    >
+                      <div class="fw-bold text-start">
+                        <span> Step #</span>
+                        <span>{{ action?.runOrder }}</span>
+                      </div>
+
+                      <div>
+                        <span class="fw-bolder text-start"> Category: </span>
+                        &nbsp;
+                        <span class="text-end">{{
+                          action?.actionTypeId?.category
+                        }}</span>
+                      </div>
+
+                      <div v-if="action?.configuration?.BranchName">
+                        <span class="fw-bolder text-start"> Branch Name: </span>
+                        &nbsp;
+                        <span class="text-end">{{
+                          action?.configuration?.BranchName
+                        }}</span>
+                      </div>
+
+                      <div v-if="action?.configuration?.DetectChanges">
+                        <span class="fw-bolder text-start">
+                          Detect Changes:
+                        </span>
+                        &nbsp;
+                        <span class="text-end">{{
+                          action?.configuration?.DetectChanges
+                        }}</span>
+                      </div>
+
+                      <div v-if="action?.configuration?.FullRepositoryId">
+                        <span class="fw-bolder text-start"> Repository: </span>
+                        &nbsp;
+                        <span class="text-end">{{
+                          action?.configuration?.FullRepositoryId
+                        }}</span>
+                      </div>
+
+                      <div v-if="action?.actionTypeId?.provider">
+                        <span class="fw-bolder text-start">
+                          Action Provider:
+                        </span>
+                        &nbsp;
+                        <span class="text-end">{{
+                          action?.actionTypeId?.provider
+                        }}</span>
+                      </div>
+
+                      <div v-if="action?.configuration?.ProjectName">
+                        <span class="fw-bolder text-start">
+                          Project Name:
+                        </span>
+                        &nbsp;
+                        <span class="text-end">{{
+                          action?.configuration?.ProjectName
+                        }}</span>
+                      </div>
+                    </div>
+                    <hr />
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
       <div class="">
         <div class="row mb-3">
-          <span class="col-3 fw-bolder text-decoration-underline text-start"
+          <span
+            class="text-sm col-3 fw-bolder text-decoration-underline text-start"
             >Action</span
           >
-          <span class="col-6 fw-bolder text-decoration-underline text-center"
+          <span
+            class="text-sm col-6 fw-bolder text-decoration-underline text-center"
             >Timestamp</span
           >
-          <span class="col-3 fw-bolder text-decoration-underline text-center"
+          <span
+            class="text-sm col-3 fw-bolder text-decoration-underline text-center"
             >Latest Status</span
           >
         </div>
         <hr class="mx-auto" />
         <div
           class="row"
-          v-for="pipeline of pipelineState.stageStates"
+          v-for="pipeline in pipelineState.stageStates"
           :key="pipeline.stageName"
         >
           <div class="col-3 text-start text-dynamic text-break fw-bolder">
@@ -162,8 +352,27 @@ function goToCodebuildLogs(pipeline) {
                 <li class="list-group-item" v-if="getCommitId(pipeline)">
                   <div class="d-flex justify-content-between">
                     <span class="fw-bolder text-start text-sm">Commit Id</span>
-                    <span class="text-break text-end text-sm">{{
-                      getCommitId(pipeline).substring(0, 8)
+                    <a
+                      v-if="
+                        getSummary(pipeline)?.ProviderType === 'GitHub' &&
+                        getFullRepositoryId() &&
+                        getCommitId(pipeline)
+                      "
+                      href="#"
+                      @click.prevent="
+                        open(
+                          'https://github.com/' +
+                            getFullRepositoryId() +
+                            '/commit/' +
+                            getCommitId(pipeline)
+                        )
+                      "
+                      ><i class="bi bi-github text-xl"></i>&nbsp;{{
+                        getCommitId(pipeline)?.substring(0, 8)
+                      }}</a
+                    >
+                    <span v-else class="text-break text-end text-sm">{{
+                      getCommitId(pipeline)?.substring(0, 8)
                     }}</span>
                   </div>
                 </li>
@@ -177,9 +386,17 @@ function goToCodebuildLogs(pipeline) {
         </div>
       </div>
 
-      <button class="btn btn-outline-primary btn-sm mt-3" @click="refresh">
+      <button
+        class="btn btn-outline-primary btn-sm mt-3"
+        @click.prevent="refresh"
+      >
         Refresh
       </button>
+    </div>
+
+    <div class="debugger" v-if="false">
+      <pre>{{ pipelineState }}</pre>
+      <pre>{{ pipelineData }}</pre>
     </div>
   </div>
 </template>

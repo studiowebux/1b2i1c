@@ -112,4 +112,4 @@ async function getPipelineState({ profiles, selectedPipeline }) {
   );
 }
 
-export { StartCodePipeline, UpdateCodePipeline, getPipelineState };
+export { StartCodePipeline, UpdateCodePipeline, getPipelineState, getPipeline };
