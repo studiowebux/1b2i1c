@@ -140,6 +140,18 @@ nano ~/onebtwoionec.config.json
 
 ## Changelog
 
+### V1.4.0 - Added new Features (#7 and #8) - 2023-01-08
+
+- The Commit ID is clickable (Only github is supported for now.)
+- You can toggle the "Detect Changes" for codepipeline directly
+- You can fetch and see all the details about the pipeline
+
+<div align="center">
+<img src="./docs/v140-commit-link.png" alt="CodePipeline Commit Link Clickable" width="333">
+<img src="./docs/v140-detect-changes.png" alt="CodePipeline Detect Changes" width="333">
+<img src="./docs/v140-info.png" alt="CodePipeline Get More Information about pipeline" width="333">
+</div>
+
 ### V1.3.0 - Improved Error/Success for the CodePipeline Source Action - 2023-01-04
 
 - This way it can guide you and avoid using the AWS UI and see quickly what is wrong with the source.
