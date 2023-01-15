@@ -59,9 +59,9 @@ async function UpdateCodePipeline({
       stage.actions[0].configuration.BranchName =
         branchName || stage.actions[0].configuration.BranchName; // eurk..
       stage.actions[0].configuration.DetectChanges =
-        detectChanges !== null
-          ? detectChanges.toString()
-          : stage.actions[0].configuration.DetectChanges;
+        detectChanges == null
+          ? stage.actions[0].configuration.DetectChanges
+          : detectChanges.toString();
       altered = true;
     }
   });

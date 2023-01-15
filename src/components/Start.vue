@@ -18,33 +18,10 @@ const props = defineProps({
 const emit = defineEmits(["updateMessage", "toggleLoading", "selectPipeline"]);
 
 const branchName = ref("");
-const detectChanges = ref(false);
-const initialDetectChanges = ref(null);
 
 const isLoading = ref("");
 
 const _selectedPipeline = ref({});
-
-watch(
-  _selectedPipeline,
-  async () => {
-    if (_selectedPipeline.value.type !== "codepipeline") return;
-    initialDetectChanges.value = null;
-    detectChanges.value = null;
-
-    initialDetectChanges.value =
-      (
-        await getPipeline({
-          profiles: props.profiles,
-          selectedPipeline: _selectedPipeline.value,
-        })
-      )?.pipeline?.stages[0]?.actions[0]?.configuration?.DetectChanges || null;
-
-    initialDetectChanges.value = initialDetectChanges.value === "true";
-    detectChanges.value = initialDetectChanges.value;
-  },
-  { deep: true }
-);
 
 function selectPipeline() {
   emit("selectPipeline", _selectedPipeline.value);
@@ -53,15 +30,11 @@ function selectPipeline() {
 async function startPipeline() {
   switch (props.selectedPipeline.type) {
     case "codepipeline":
-      if (
-        branchName.value !== "" ||
-        detectChanges.value !== initialDetectChanges.value
-      )
+      if (branchName.value !== "")
         await UpdateCodePipeline({
           profiles: props.profiles,
           selectedPipeline: props.selectedPipeline,
           branchName: branchName.value,
-          detectChanges: detectChanges.value,
         });
       return StartCodePipeline({
         profiles: props.profiles,
@@ -147,20 +120,6 @@ async function start() {
             placeholder="branch name"
             v-model="branchName"
           />
-        </div>
-
-        <div v-if="props.selectedPipeline.type === 'codepipeline'" class="mt-2">
-          <div class="form-check form-switch text-end">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="detectChanges"
-              v-model="detectChanges"
-            />
-            <label class="form-check-label" for="detectChanges"
-              >Detect Changes</label
-            >
-          </div>
         </div>
       </form>
 

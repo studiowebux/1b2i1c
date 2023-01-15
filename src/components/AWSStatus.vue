@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import { getPipeline, getPipelineState } from "../utils/codepipeline";
 import { open } from "@tauri-apps/api/shell";
+import DetectChanges from "./Inputs/DetectChanges.vue";
 
 const props = defineProps({
   configurations: Object,
@@ -107,6 +108,13 @@ function getFullRepositoryId() {
             <i class="bi bi-info-circle text-xl text-info fw-bolder"></i>
           </a>
         </div>
+      </div>
+
+      <div id="pipelineConfiguration" class="mb-3">
+        <DetectChanges
+          :selectedPipeline="props.selectedPipeline"
+          :profiles="props.profiles"
+        />
       </div>
 
       <div id="moreInfoCollapse" class="collapse">
