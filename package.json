@@ -12,18 +12,16 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@aws-sdk/client-cloudformation": "^3.181.0",
     "@aws-sdk/client-codepipeline": "^3.181.0",
     "@aws-sdk/client-sts": "^3.181.0",
-    "@aws-sdk/credential-provider-ini": "^3.181.0",
-    "@aws-sdk/credential-providers": "^3.181.0",
     "@octokit/rest": "^19.0.4",
     "@popperjs/core": "^2.11.6",
     "@tauri-apps/api": "^1.1.0",
     "bootstrap": "^5.2.1",
     "bootstrap-icons": "^1.9.1",
     "vue": "^3.2.37",
-    "vue-timeago3": "^2.3.0"
+    "vue-timeago3": "^2.3.0",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.1.1",
