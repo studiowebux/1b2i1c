@@ -5,7 +5,7 @@ import { useStore } from "vuex";
 const store = useStore();
 
 const detectChanges = ref(false);
-const isLoading = ref(false);
+const isLoading = computed(() => store.state.loadingHandler.isLoading);
 
 const pipelineData = computed(() => store.state.pipelines.pipeline);
 const selectedPipeline = computed(() => store.state.pipelines.selectedPipeline);
@@ -14,23 +14,24 @@ watch(
   pipelineData,
   () => {
     detectChanges.value =
-    pipelineData.value?.stages[0]?.actions[0]?.configuration
-        ?.DetectChanges || null;
+      pipelineData.value?.stages[0]?.actions[0]?.configuration?.DetectChanges ||
+      null;
   },
-  { deep: true, immediate: true }
+  { deep: true }
 );
 
 async function updatePipeline() {
   try {
-    isLoading.value = true;
+    store.dispatch("loadingHandler/startLoading");
     await store.dispatch("pipelines/updatePipeline", {
       detectChanges: detectChanges.value,
     });
+    store.dispatch("messageHandler/setMessage", `Pipeline updated`);
   } catch (e) {
-    console.error(e);
+    store.dispatch("messageHandler/setError", e.message);
     throw e;
   } finally {
-    isLoading.value = false;
+    store.dispatch("loadingHandler/stopLoading");
   }
 }
 </script>

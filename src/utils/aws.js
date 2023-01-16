@@ -103,7 +103,6 @@ const extractOneProfile = async ({ profile, rawCredentials }) => {
   });
 
   if (extractedCredentials.assumeRole) {
-    console.debug("Loading source profile.");
     const sourceProfile = await extractOneProfile({
       profile: `[${extractedCredentials.sourceProfile}]`,
       rawCredentials,

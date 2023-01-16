@@ -11,18 +11,16 @@ const store = useStore();
 
 const selectedPipeline = computed(() => store.state.pipelines.selectedPipeline);
 
-const isLoading = ref(false);
-
 async function refresh() {
   try {
-    isLoading.value = true;
+    store.dispatch("loadingHandler/startLoading");
     store.dispatch("messageHandler/setMessage", "Refreshing Status...");
     await store.dispatch("pipelines/loadPipeline");
   } catch (e) {
     store.dispatch("messageHandler/setError", e.message);
     throw e;
   } finally {
-    isLoading.value = false;
+    store.dispatch("loadingHandler/stopLoading");
     store.dispatch("messageHandler/resetMessage");
   }
 }

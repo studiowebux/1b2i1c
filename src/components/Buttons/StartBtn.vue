@@ -10,11 +10,11 @@ const props = defineProps({
   branchName: String,
 });
 
-const isLoading = ref(false);
+const isLoading = computed(() => store.state.loadingHandler.isLoading);
 
 async function start() {
   try {
-    isLoading.value = true;
+    store.dispatch("loadingHandler/startLoading");
 
     const { pipelineExecutionId } = await store.dispatch(
       "pipelines/startPipeline",
@@ -31,7 +31,7 @@ async function start() {
     store.dispatch("messageHandler/setError", e.message);
     throw e;
   } finally {
-    isLoading.value = false;
+    store.dispatch("loadingHandler/stopLoading");
   }
 }
 </script>

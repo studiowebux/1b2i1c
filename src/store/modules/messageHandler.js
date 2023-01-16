@@ -36,7 +36,6 @@ const mutations = {
   },
 
   setMessage(state, msg) {
-    console.log(state);
     state.message = msg;
   },
 
