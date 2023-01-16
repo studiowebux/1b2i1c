@@ -140,6 +140,14 @@ nano ~/onebtwoionec.config.json
 
 ## Changelog
 
+
+### V1.4.2 - Moved code to Vuex (#12) - 2023-01-15
+
+- Implemented Vuex
+- Split into smaller components
+- Implemented views
+- Code Cleanup
+
 ### V1.4.1 - Improved UX and Flow for the detect changes toggle (#14) - 2023-01-15
 
 - Moved the detect changes logic, isolated it to update the pipeline only

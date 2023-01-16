@@ -1,7 +1,7 @@
 {
   "name": "@yetanothertool/onebtwoionec",
   "private": true,
-  "version": "1.4.1",
+  "version": "1.4.2",
   "type": "module",
   "author": "Studio Webux",
   "description": "A simple and configurable UI to Start and Update CodePipeline and/or Github Actions",

@@ -1,6 +1,6 @@
 [package]
 name = "onebtwoionec"
-version = "1.4.1"
+version = "1.4.2"
 description = "A simple and configurable UI to Start and Update CodePipeline and/or Github Actions"
 authors = ["Studio Webux"]
 license = "MIT"
