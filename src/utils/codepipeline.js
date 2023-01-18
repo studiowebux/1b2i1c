@@ -56,12 +56,10 @@ async function UpdateCodePipeline({
   let altered = false;
   _pipeline.stages.map((stage) => {
     if (stage.name.includes(selectedPipeline.codePipelineActionName)) {
-      stage.actions[0].configuration.BranchName =
-        branchName || stage.actions[0].configuration.BranchName; // eurk..
-      stage.actions[0].configuration.DetectChanges =
-        detectChanges !== null
-          ? detectChanges.toString()
-          : stage.actions[0].configuration.DetectChanges;
+      const config = stage.actions[0].configuration;
+      config.BranchName = branchName || config.BranchName;
+      config.DetectChanges =
+        detectChanges == null ? config.DetectChanges : detectChanges.toString();
       altered = true;
     }
   });

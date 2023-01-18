@@ -3,7 +3,9 @@ import { readTextFile, BaseDirectory } from "@tauri-apps/api/fs";
 import { STSClient, AssumeRoleCommand } from "@aws-sdk/client-sts";
 
 const readCredentials = async () =>
-  readTextFile(".aws/credentials", { dir: BaseDirectory.Home });
+  Promise.resolve(
+    readTextFile(".aws/credentials", { dir: BaseDirectory.Home })
+  );
 
 const convertToArray = ({ rawCredentials }) => {
   if (!rawCredentials || rawCredentials.length === 0) {
@@ -101,7 +103,6 @@ const extractOneProfile = async ({ profile, rawCredentials }) => {
   });
 
   if (extractedCredentials.assumeRole) {
-    console.debug("Loading source profile.");
     const sourceProfile = await extractOneProfile({
       profile: `[${extractedCredentials.sourceProfile}]`,
       rawCredentials,
@@ -131,7 +132,6 @@ const extractProfiles = async ({ rawCredentials }) => {
 };
 
 async function assumeRole({ profiles, profile }) {
-  console.debug(profiles);
   let _profile = profiles.find((pv) => pv.profile.includes(profile));
 
   if (!_profile) throw new Error("Profile not found");
