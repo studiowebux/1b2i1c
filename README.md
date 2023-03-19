@@ -140,7 +140,50 @@ nano ~/onebtwoionec.config.json
 
 ## Changelog
 
-### V1.2.0 - Added Github Actions - 2022-10-05
+
+### V1.4.2 - Moved code to Vuex (#12) - 2023-01-15
+
+- Implemented Vuex
+- Split into smaller components
+- Implemented views
+- Code Cleanup
+
+### V1.4.1 - Improved UX and Flow for the detect changes toggle (#14) - 2023-01-15
+
+- Moved the detect changes logic, isolated it to update the pipeline only
+
+<div align="center">
+<img src="./docs/v141.png" alt="Detect Changes UX" width="333">
+</div>
+
+<details>
+  <summary>### V1.4.0 - Added new Features (#7 and #8) - 2023-01-08</summary>
+
+- The Commit ID is clickable (Only github is supported for now.)
+- You can toggle the "Detect Changes" for codepipeline directly
+- You can fetch and see all the details about the pipeline
+
+<div align="center">
+<img src="./docs/v140-commit-link.png" alt="CodePipeline Commit Link Clickable" width="333">
+<img src="./docs/v140-detect-changes.png" alt="CodePipeline Detect Changes" width="333">
+<img src="./docs/v140-info.png" alt="CodePipeline Get More Information about pipeline" width="333">
+</div>
+
+</details>
+
+<details>
+  <summary>### V1.3.0 - Improved Error/Success for the CodePipeline Source Action - 2023-01-04</summary>
+
+- This way it can guide you and avoid using the AWS UI and see quickly what is wrong with the source.
+<div align="center">
+<img src="./docs/errorHandling.png" alt="CodePipeline Source Error Handling" width="333">
+<img src="./docs/success.png" alt="CodePipeline Source Success" width="333">
+</div>
+
+</details>
+
+<details>
+  <summary>### V1.2.0 - Added Github Actions - 2022-10-05</summary>
 
 - Tested the whole Github Action Flow
 - Tested on different systems (MacOS X64, M1 and Windows thanks @maxeber)
@@ -148,7 +191,10 @@ nano ~/onebtwoionec.config.json
 - Fixed bugs when CodePipeline response is not defined
 - Fixed time ago integration
 
-### V1.1.0 - Added Github Actions - 2022-10-01
+</details>
+
+<details>
+  <summary>### V1.1.0 - Added Github Actions - 2022-10-01</summary>
 
 - Start Github Actions using the workflow_dispatch
 - Added Github Personal Access Token
@@ -156,10 +202,17 @@ nano ~/onebtwoionec.config.json
 - Revamp the code structure
 - Added Github Actions example
 
-### V1.0.0 - CodePipeline - 2022-09-30
+</details>
+
+<details>
+  <summary>### V1.0.0 - CodePipeline - 2022-09-30</summary>
 
 - Start CodePipeline
 - Update CodePipeline Source Branch Name
+
+</details>
+
+---
 
 ## Contributing
 

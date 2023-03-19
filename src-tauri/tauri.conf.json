@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "onebtwoionec",
-    "version": "1.2.0"
+    "version": "1.4.2"
   },
   "tauri": {
     "systemTray": {
@@ -22,6 +22,9 @@
       },
       "path": {
         "all": true
+      },
+      "shell": {
+        "open": true
       }
     },
     "bundle": {
