@@ -4,6 +4,7 @@ import { useStore } from "vuex";
 
 import Start from "./views/Start.vue";
 import AWSStatus from "./views/AWSStatus.vue";
+import GithubStatus from "./views/GithubStatus.vue";
 
 import Message from "./components/Messages/Message.vue";
 
@@ -12,7 +13,6 @@ const store = useStore();
 const isInitializing = ref("");
 
 const isLoading = computed(() => store.state.loadingHandler.isLoading);
-
 const selectedPipeline = computed(() => store.state.pipelines.selectedPipeline);
 
 onMounted(async () => {
@@ -44,7 +44,9 @@ onMounted(async () => {
 
     <div class="modules">
       <Start />
+      <hr />
       <AWSStatus v-if="selectedPipeline?.type === 'codepipeline'" />
+      <GithubStatus v-if="selectedPipeline?.type === 'github'" />
     </div>
   </div>
 </template>

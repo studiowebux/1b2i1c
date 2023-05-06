@@ -5,6 +5,7 @@
 <h2>1 Button 2 Inputs 1 Configuration</h2>
 
 <p>A simple and configurable UI to Start and Update CodePipeline and/or Github Actions.</p>
+<p>This application uses a simple configuration file in JSON, it gives you control of your pipelines and show statuses, general information and more !</p>
 
 <p align="center">
   <a href="https://github.com/yet-another-tool/1b2i1c/issues">Report Bug</a>
@@ -36,6 +37,12 @@
 ---
 
 ## About
+
+- Supports **Github Actions** through _Workflow Dispatch_ (`workflow_dispatch`)
+- Supports **AWS CodePipeline** using _AWS SDK v3_
+- Uses a JSON format to configure your pipelines
+- Uses your credentials to interact with pipelines
+- Let you deploy specific branch
 
 <div>
 <b> | </b>
@@ -138,23 +145,49 @@ nano ~/onebtwoionec.config.json
 
 ---
 
+### Github Actions permissions
+
+```text
+Full Control: Repo
+Workflow
+```
+
+---
+
 ## Changelog
 
+### Todo
 
-### V1.4.2 - Moved code to Vuex (#12) - 2023-01-15
+- [] Autofill branch name in the pipeline.
+- [] Real time and notification events.
+
+### V1.5.0 - Added more details for github actions workflows - 2023-05-05
+
+- Added github workflow information
+- Added github inputs
+
+<div align="center">
+<img src="./docs/v150.png" alt="Github Information" width="333">
+</div>
+
+<details>
+  <summary>### V1.4.2 - Moved code to Vuex (#12) - 2023-01-15</summary>
 
 - Implemented Vuex
 - Split into smaller components
 - Implemented views
 - Code Cleanup
+</details>
 
-### V1.4.1 - Improved UX and Flow for the detect changes toggle (#14) - 2023-01-15
+<details>
+  <summary>### V1.4.1 - Improved UX and Flow for the detect changes toggle (#14) - 2023-01-15</summary>
 
 - Moved the detect changes logic, isolated it to update the pipeline only
 
 <div align="center">
 <img src="./docs/v141.png" alt="Detect Changes UX" width="333">
 </div>
+</details>
 
 <details>
   <summary>### V1.4.0 - Added new Features (#7 and #8) - 2023-01-08</summary>

@@ -4,12 +4,14 @@ import {
   StartCodePipeline,
   UpdateCodePipeline,
 } from "../../utils/codepipeline";
-import { useGithubAction } from "../../utils/github";
+import { useGithubAction, getWorkflowDetails } from "../../utils/github";
 
 const state = () => ({
   selectedPipeline: null,
   pipeline: {},
   status: {},
+  inputs: {}, // Github only
+  workflow: {}, // Github only
 });
 
 // getters
@@ -22,6 +24,28 @@ const actions = {
     if (pipeline.type === "codepipeline") await dispatch("loadPipeline");
   },
 
+  async githubStatus({ state, rootState, commit }) {
+    try {
+      if (
+        !state.selectedPipeline ||
+        Object.keys(state.selectedPipeline).length === 0
+      )
+        throw new Error("Please Select a pipeline.");
+
+      const workflow = await getWorkflowDetails({
+        auth: rootState.configurations.configurations.authentication.github
+          .api_key,
+        repo: state.selectedPipeline.repository,
+        owner: state.selectedPipeline.owner,
+      });
+
+      commit("loadWorkflow", { workflow: workflow.data });
+    } catch (e) {
+      throw new Error(e.message);
+    }
+  },
+
+  // AWS Only
   async loadPipeline({ state, rootState, commit }) {
     try {
       if (
@@ -71,6 +95,7 @@ const actions = {
     }
   },
 
+  // AWS Only
   async updatePipeline({ state, rootState }, { branchName, detectChanges }) {
     return UpdateCodePipeline({
       profiles: rootState.configurations.profiles,
@@ -87,12 +112,17 @@ const mutations = {
     state.pipeline = pipeline;
   },
 
+  loadWorkflow(state, { workflow }) {
+    state.workflow = workflow;
+  },
+
   loadStatus(state, { status }) {
     state.status = status;
   },
 
   setSelectedPipeline(state, pipeline) {
     state.selectedPipeline = pipeline;
+    state.inputs = pipeline.inputs || {};
   },
 };
 
