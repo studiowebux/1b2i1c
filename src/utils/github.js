@@ -35,4 +35,18 @@ async function useGithubAction({
   );
 }
 
-export { useGithubAction };
+async function getWorkflowDetails({ auth, repo, owner }) {
+  const octokit = new Octokit({
+    auth,
+  });
+
+  return octokit.request("GET /repos/{owner}/{repo}/actions/runs", {
+    owner,
+    repo,
+    headers: {
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
+  });
+}
+
+export { useGithubAction, getWorkflowDetails };
