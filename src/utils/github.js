@@ -1,6 +1,6 @@
 // Studio Webux @ 2022
 
-import { Octokit } from "https://cdn.skypack.dev/octokit";
+import { Octokit } from "https://esm.sh/octokit@2.0.19?target=es2019";
 
 /**
  *
