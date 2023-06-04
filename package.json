@@ -1,7 +1,7 @@
 {
   "name": "@yetanothertool/onebtwoionec",
   "private": true,
-  "version": "1.5.0",
+  "version": "1.5.1",
   "type": "module",
   "author": "Studio Webux",
   "description": "A simple and configurable UI to Start and Update CodePipeline and/or Github Actions",
@@ -26,7 +26,7 @@
   "devDependencies": {
     "@tauri-apps/cli": "^1.1.1",
     "@vitejs/plugin-vue": "^3.0.1",
-    "node-sass": "^7.0.3",
+    "node-sass": "^9.0.0",
     "sass": "^1.55.0",
     "sass-loader": "^13.0.2",
     "vite": "^3.0.2"
