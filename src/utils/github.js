@@ -1,6 +1,9 @@
 // Studio Webux @ 2022
 
-import { Octokit } from "https://cdn.skypack.dev/octokit";
+// TODO: This thing is broken..
+// FIXME: get rid of that completely.
+// REF: https://github.com/octokit/octokit.js/issues/2450
+import { Octokit } from "https://cdn.skypack.dev/octokit@2.0.14";
 
 /**
  *
