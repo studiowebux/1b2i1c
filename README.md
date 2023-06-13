@@ -30,7 +30,6 @@
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-
   </ol>
 </details>
 
@@ -43,24 +42,10 @@
 - Uses a JSON format to configure your pipelines
 - Uses your credentials to interact with pipelines
 - Let you deploy specific branch
-
-<div>
-<b> | </b>
-<a href="https://www.buymeacoffee.com/studiowebux" target="_blank"
-      ><img
-        src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
-        alt="Buy Me A Coffee"
-        style="height: 30px !important; width: 105px !important"
-/></a>
-<b> | </b>
-<a href="https://webuxlab.com" target="_blank"
-      ><img
-        src="https://webuxlab-static.s3.ca-central-1.amazonaws.com/logoAmpoule.svg"
-        alt="Webux Logo"
-        style="height: 30px !important"
-/> Webux Lab</a>
-<b> | </b>
-</div>
+- Provide an easy way to share pipeline configurations to different team
+- Give more control to developers and avoid the hassle to go in the Github or AWS UI
+- Quickly deploy a branch to a specific environment
+- See what is where with two clicks
 
 ---
 
@@ -161,7 +146,12 @@ Workflow
 - [] Autofill branch name in the pipeline.
 - [] Real time and notification events.
 
-### V1.5.0 - Added more details for github actions workflows - 2023-05-05
+### V1.5.1 - Third Party dependency issue
+
+- Fixed github octokit CDN
+
+<details>
+  <summary>### V1.5.0 - Added more details for github actions workflows - 2023-05-05</summary>
 
 - Added github workflow information
 - Added github inputs
@@ -169,7 +159,7 @@ Workflow
 <div align="center">
 <img src="./docs/v150.png" alt="Github Information" width="333">
 </div>
-
+</details>
 <details>
   <summary>### V1.4.2 - Moved code to Vuex (#12) - 2023-01-15</summary>
 
@@ -312,5 +302,25 @@ Distributed under the MIT License. See LICENSE for more information.
 ## Contact
 
 - Tommy Gingras @ tommy@studiowebux.com | Studio Webux
+
+---
+
+<div>
+<b> | </b>
+<a href="https://www.buymeacoffee.com/studiowebux" target="_blank"
+      ><img
+        src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+        alt="Buy Me A Coffee"
+        style="height: 30px !important; width: 105px !important"
+/></a>
+<b> | </b>
+<a href="https://webuxlab.com" target="_blank"
+      ><img
+        src="https://webuxlab-static.s3.ca-central-1.amazonaws.com/logoAmpoule.svg"
+        alt="Webux Logo"
+        style="height: 30px !important"
+/> Webux Lab</a>
+<b> | </b>
+</div>
 
 ---
