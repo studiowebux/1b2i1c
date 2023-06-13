@@ -146,9 +146,15 @@ Workflow
 - [] Autofill branch name in the pipeline.
 - [] Real time and notification events.
 
-### V1.5.1 - Third Party dependency issue
+### V1.5.2 - Rollback
+
+- Rollback github octokit CDN
+
+<details>
+  <summary>### V1.5.1 - Third Party dependency issue</summary>
 
 - Fixed github octokit CDN
+</details>
 
 <details>
   <summary>### V1.5.0 - Added more details for github actions workflows - 2023-05-05</summary>
